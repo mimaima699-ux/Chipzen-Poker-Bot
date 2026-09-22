@@ -10,6 +10,10 @@ the full debugging history of how each version leaked chips and how it was
 fixed. Seasons run weekly — the tooling here matters more than any single
 set of thresholds.
 
+> 🃏 The parent project is live at <https://texasholdem-mima.me/> — a full
+> multiplayer Texas Hold'em platform with server-authoritative rules, room
+> sharing, and AI opponents.
+
 ## How it plays
 
 - **Range-aware Monte Carlo equity** — every decision samples opponent hole
