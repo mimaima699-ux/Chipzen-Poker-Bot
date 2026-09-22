@@ -1,0 +1,28 @@
+{
+  "name": "chipzen-poker-bot",
+  "version": "5.0.0",
+  "description": "Equity-driven No Limit Hold'em bot for the Chipzen AI poker arena, with replay-driven tuning tooling",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mimaima699-ux/Chipzen-Poker-Bot.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "bench": "node scripts/bench.mjs",
+    "selfplay": "node scripts/selfplay.mjs",
+    "bundle": "esbuild bot.js --bundle --platform=node --format=esm --outfile=dist/bot.js --metafile=dist/meta.json --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
+    "package": "node scripts/package.mjs"
+  },
+  "dependencies": {
+    "@chipzen-ai/bot": "^0.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

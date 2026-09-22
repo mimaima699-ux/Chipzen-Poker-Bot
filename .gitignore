@@ -1,0 +1,13 @@
+node_modules/
+dist/
+pkg/
+*.tar.gz
+*.zip
+# Platform data pulled from the Chipzen API during analysis sessions
+cz-*.json
+replay-*.json
+protocol.md
+*-results.txt
+sixmax-results.txt
+hu-results.txt
+npm-debug.log*
