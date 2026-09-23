@@ -12,6 +12,7 @@ import { PokerGame } from '../../poker/server/src/game/gameEngine.js'
 import * as v1mod from '../src/engine/aiPlayerV1.js'
 import * as v2mod from '../src/engine/aiPlayerV2.js'
 import * as v3mod from '../src/engine/aiPlayer.js'
+import * as v5mod from '../src/engine/aiPlayerV5.js'
 import { makeRng } from '../src/rng.js'
 
 // A minimal "Fold-ver-2" style opponent: folds to any bet, checks otherwise.
@@ -19,7 +20,7 @@ import { makeRng } from '../src/rng.js'
 // the original red flag.
 const foldBot = () => (ctx) => (ctx.toCall > 0 ? { type: 'fold' } : { type: 'check' })
 
-const VERSIONS = { v1: v1mod.decide, v2: v2mod.decide, v3: v3mod.decide, fold: foldBot() }
+const VERSIONS = { v1: v1mod.decide, v2: v2mod.decide, v3: v3mod.decide, v5: v5mod.decide, fold: foldBot() }
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((a, i, all) => (a.startsWith('--') ? [a.slice(2), all[i + 1]] : [])).filter((x) => x.length),
@@ -58,6 +59,8 @@ function buildCtx(game, p, rng, profiles, raisedPreflop) {
         folded: q.folded,
         profile: profiles.get(q.id) ?? null,
         preflopRaised: raisedPreflop.has(q.id),
+        betThisStreet: game.community.length > 0 && q.bet > 0,
+        raisedThisStreet: game.community.length > 0 && q.bet >= game.streetBet && game.streetBet > 0,
       })),
     rng,
     deadline: Date.now() + DECIDE_BUDGET_MS,

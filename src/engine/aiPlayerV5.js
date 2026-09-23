@@ -104,24 +104,7 @@ export function decide(ctx) {
   // How loose the loosest remaining opponent is (0 = nit, 1 = plays any two):
   // we widen our aggression against loose players and tighten against nits.
   const looseness = ranges.length ? Math.max(...ranges) : 0.5
-
-  // Equity facing aggression. Raw `equity` is computed against each
-  // opponent's CURRENT range (a raiser is on top-pct hands), but the
-  // postflop strong/medium thresholds were calibrated against random ranges
-  // — v5 stacked off K5/44 for 5k pots at 0/8 showdowns because a
-  // vs-top-20% equity reads ~10pts high as a hand strength. Blend: nobody
-  // has shown aggression → use raw equity; someone has bet/raised → weight
-  // in an equity-vs-random estimate for a truer "absolute" hand strength.
-  let equityVsAggr = equity
-  if (active.some((o) => o.betThisStreet || o.raisedThisStreet)) {
-    const eqRandom = equityVsRanges(ctx.hole, ctx.community, active.map(() => 1.0), {
-      rng: ctx.rng,
-      deadline: ctx.deadline,
-      iterations: 250,
-    })
-    equityVsAggr = 0.5 * equity + 0.5 * eqRandom
-  }
-  const enriched = { ...ctx, equity, equityVsAggr, share, foldEq, looseness }
+  const enriched = { ...ctx, equity, share, foldEq, looseness }
   return ctx.community.length === 0 ? decidePreflop(enriched) : decidePostflop(enriched)
 }
 
@@ -255,11 +238,7 @@ export function boardWetness(community) {
 }
 
 function decidePostflop(ctx) {
-  const { hole, community, toCall, currentBet, potSize, legal, position, rng, share, stack, foldEq } = ctx
-  // Strength signal for bet/call thresholds: the aggression-weighted equity
-  // (see decide()). Facing a bet, opponents hold stronger-than-random hands,
-  // so raw range-equity overstates second-best hands.
-  const eq = ctx.equityVsAggr ?? ctx.equity
+  const { hole, community, toCall, currentBet, potSize, legal, position, rng, equity, share, stack, foldEq } = ctx
   // No card is coming on the river — draws are dead there, so outs are 0.
   // (The original room AI shared this flaw; calling river shoves with a
   // gutshot-that-already-bricked bleeds chips.)
@@ -271,8 +250,8 @@ function decidePostflop(ctx) {
   // Vs a frequent folder, value thresholds collapse toward "bet anything
   // decent" — checked-down medium hands just flip coins for the blinds.
   const vsFolder = foldEq > 0.6
-  const strong = eq > share + (vsFolder ? 0.05 : 0.18)
-  const medium = eq > share + (vsFolder ? 0.0 : 0.08)
+  const strong = equity > share + (vsFolder ? 0.05 : 0.18)
+  const medium = equity > share + (vsFolder ? 0.0 : 0.08)
   const betFrac = toCall > 0 ? toCall / Math.max(1, potSize) : 0
   // V3: oversized bets demand equity above raw pot odds. Calling near-price
   // vs huge raises donated 5k+ pots with second-best hands (replay 72c11aa8).
@@ -301,9 +280,8 @@ function decidePostflop(ctx) {
     return { type: 'check' }
   }
 
-  // Facing a bet: call only when the aggression-weighted equity clears the
-  // scaled pot odds.
-  if (eq > price + needMargin) {
+  // Facing a bet: call only when equity clears the scaled pot odds.
+  if (equity > price + needMargin) {
     if (strong && spr < 2.5 && legal.canRaise) {
       return raiseTo(ctx, legal.raiseMax) // low stack-to-pot: get the money in
     }

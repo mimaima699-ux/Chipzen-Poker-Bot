@@ -53,7 +53,8 @@ real platform replay, decision by decision. Bugs that live in the glue layer
 |---|---|---|---|
 | v3 | 1W–4L | VPIP 61% / PFR 11% | Replay-driven rewrite; strategy right, plumbing broken |
 | v4 | 5W–2L | VPIP 33%, big-pot showdowns 37%→57% | Dual-channel opponent tracking |
-| v5 | — | PFR 11%→47% on the same replays | Button-seat dead-code fix |
+| v5 | 4W–7L | PFR 11%→47%, but showdowns 0/8 | Button-seat dead-code fix |
+| v6 | — | — | Aggression-weighted equity for postflop strength |
 
 ### Post-mortems
 
@@ -69,6 +70,11 @@ real platform replay, decision by decision. Bugs that live in the glue layer
 3. **The button branch that never ran** — HU button = small blind, which
    always faces a toCall, so the "button opens top 60%" path (written for
    toCall === 0) was dead code and PFR stayed at 11%.
+4. **Preflop fixed, postflop broken** — v5 tightened preflop (enter = raise)
+   but postflop strength was still measured vs random ranges, so K5/44/52
+   called 5k pots against raisers at 0/8 showdowns. A bettor's range beats
+   random; v6 blends equity-vs-random into strength thresholds whenever an
+   opponent has shown aggression this street.
 
 ## Quick start
 

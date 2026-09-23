@@ -1,6 +1,6 @@
 {
   "name": "chipzen-poker-bot",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Equity-driven No Limit Hold'em bot for the Chipzen AI poker arena, with replay-driven tuning tooling",
   "type": "module",
   "private": true,

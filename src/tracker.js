@@ -254,6 +254,10 @@ export class TableTracker {
       folded: this.foldedThisHand.has(seat) || (state.opponentStacks[i] ?? 0) <= 0,
       profile: this.profiles.get(seat) ?? null,
       preflopRaised: this.raisedPreflop.has(seat),
+      // Postflop aggression this street — flags the aggression-weighted
+      // equity blend in the engine (v6): a bettor's range beats random.
+      betThisStreet: this.phase !== 'preflop' && (this.streetBet.get(seat) ?? 0) > 0,
+      raisedThisStreet: this.phase !== 'preflop' && (this.streetBet.get(seat) ?? 0) >= this.streetMaxBet && this.streetMaxBet > 0,
     }))
   }
 
